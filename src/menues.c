@@ -32,6 +32,8 @@ Modifications for JonoF's port by Jonathon Fowler (jf@jonof.id.au)
 #include <sys/stat.h>
 #include <assert.h>
 
+/* Error codes */
+#define eTenBnNotInWindows 3801
 
 struct savehead {
     char name[19];
@@ -63,7 +65,6 @@ static struct vidset {
 static int curvidset, newvidset, numvidsets;
 
 static const char *mousebuttonnames[] = { "Left", "Right", "Middle", "Thumb", "Wheel Down", "Wheel Up" };
-
 
 void cmenu(short cm)
 {
@@ -278,9 +279,6 @@ int loadplayer(signed char spot)
     if (waloff[TILE_LOADSHOT] == 0) allocache((void **)&waloff[TILE_LOADSHOT],320*200,&walock[TILE_LOADSHOT]);
     tilesizx[TILE_LOADSHOT] = 200; tilesizy[TILE_LOADSHOT] = 320;
     if (kdfread((char *)waloff[TILE_LOADSHOT],320,200,fil) != 200) goto corrupt;
-#if USE_POLYMOST && USE_OPENGL
-    invalidatetile(TILE_LOADSHOT,0,255);
-#endif
 
     if (kdfread(&numwalls,2,1,fil) != 1) goto corrupt;
     if (kdfread(&wall[0],sizeof(walltype),MAXWALLS,fil) != MAXWALLS) goto corrupt;
@@ -1062,6 +1060,7 @@ void menus(void)
     short c,x,i,s;
     int l,m;
     char *p = NULL;
+	int tenerr;
 
     getpackets();
 
@@ -1120,6 +1119,13 @@ void menus(void)
             gametext(160,149+16,"PRESS ANY KEY...",0,2+8+16);
 
             if( x >= -1 ) cmenu(100);
+            break;
+		case 20001:
+            x = probe(188,80+32+32,0,0);
+            gametext(160,86-8,"You must be in Windows 95 to",0,2+8+16);
+            gametext(160,86,"play on TEN",0,2+8+16);
+            gametext(160,86+32,"PRESS ANY KEY...",0,2+8+16);
+            if(x >= -1) cmenu(0);
             break;
 
         case 15001:
@@ -1676,7 +1682,7 @@ cheat_for_port_credits:
             rotatesprite(c<<16,28<<16,65536L,0,INGAMEDUKETHREEDEE,0,0,10,0,0,xdim-1,ydim-1);
             if (PLUTOPAK)   // JBF 20030804
                 rotatesprite((c+100)<<16,36<<16,65536L,0,PLUTOPAKSPRITE+2,(sintable[(totalclock<<4)&2047]>>11),0,2+8,0,0,xdim-1,ydim-1);
-            x = probe(c,67,16,6);
+            x = probe(c,67,16,7);
             if(x >= 0)
             {
                 if( ud.multimode > 1 && x == 0 && ud.recstat != 2)
@@ -1695,16 +1701,25 @@ cheat_for_port_credits:
                         case 0:
                             cmenu(100);
                             break;
+                        case 1:
+                            if(movesperpacket == 4 || numplayers > 1)
+                                break;
 
-                        case 1: cmenu(200);break;
-                        case 2:
+				        case eTenBnNotInWindows:
+                            cmenu(20001);
+                            break;
+                        default:
+                            gameexit(" ");
+                            break;
+                        case 2: cmenu(200);break;
+                        case 3:
                             if(movesperpacket == 4 && connecthead != myconnectindex)
                                 break;
                             cmenu(300);
                             break;
-                        case 3: KB_FlushKeyboardQueue();cmenu(400);break;
-                        case 4: cmenu(990);break;
-                        case 5: cmenu(500);break;
+                        case 4: KB_FlushKeyboardQueue();cmenu(400);break;
+                        case 5: cmenu(990);break;
+                        case 6: cmenu(500);break;
                     }
                 }
             }
@@ -1731,17 +1746,22 @@ cheat_for_port_credits:
             else
                 menutext(c,67,SHX(-2),PHX(-2),"NEW GAME");
 
-            menutext(c,67+16,SHX(-3),PHX(-3),"OPTIONS");
+            if(movesperpacket != 4 && numplayers < 2)
+                menutext(c,67+16,SHX(-3),PHX(-3),"PLAY ON TEN");
+            else
+                menutext(c,67+16,SHX(-3),1,"PLAY ON TEN");
+
+            menutext(c,67+16+16,SHX(-4),PHX(-4),"OPTIONS");
 
             if(movesperpacket == 4 && connecthead != myconnectindex)
-                menutext(c,67+16+16,SHX(-4),1,"LOAD GAME");
-            else menutext(c,67+16+16,SHX(-4),PHX(-4),"LOAD GAME");
+                menutext(c,67+16+16+16,SHX(-5),1,"LOAD GAME");
+            else menutext(c,67+16+16+16,SHX(-5),PHX(-5),"LOAD GAME");
 
-            menutext(c,67+16+16+16,SHX(-5),PHX(-5), VOLUMEALL ? "HELP" : "HOW TO ORDER");
+            menutext(c,67+16+16+16+16,SHX(-5),PHX(-5), VOLUMEALL ? "HELP" : "HOW TO ORDER");
 
-            menutext(c,67+16+16+16+16,SHX(-6),PHX(-6),"CREDITS");
+            menutext(c,67+16+16+16+16+16,SHX(-7),PHX(-7),"CREDITS");
 
-            menutext(c,67+16+16+16+16+16,SHX(-7),PHX(-7),"QUIT");
+            menutext(c,67+16+16+16+16+16+16,SHX(-8),PHX(-8),"QUIT");
             break;
 
         case 50:
@@ -1840,14 +1860,13 @@ if (!VOLUMEALL) {
         case 100:
             rotatesprite(160<<16,19<<16,65536L,0,MENUBAR,16,0,10,0,0,xdim-1,ydim-1);
             menutext(160,24,0,0,"SELECT AN EPISODE");
-//            if(boardfilename[0])
+            if(boardfilename[0])
 if (PLUTOPAK)
                 x = probe(160,60,20,5);
-//            else x = probe(160,60,20,4);
-//            if(boardfilename[0])
-else
+            else x = probe(160,60,20,4);
+            if(boardfilename[0])
                 x = probe(160,60,20,VOLUMEONE?3:4);
-//            else x = probe(160,60,20,3);
+            else x = probe(160,60,20,3);
             if(x >= 0)
             {
 if (VOLUMEONE) {
@@ -1862,17 +1881,17 @@ if (VOLUMEONE) {
 }
 
 if (!VOLUMEONE) {
-                if(!PLUTOPAK && x == 3 /*&& boardfilename[0]*/)
+                if(!PLUTOPAK && x == 3 && boardfilename[0])
                 {
-                    //ud.m_volume_number = 0;
-                    //ud.m_level_number = 7;
+                    ud.m_volume_number = 0;
+                    ud.m_level_number = 7;
             currentlist = 1;
             cmenu(101);
                 }
-        else if(PLUTOPAK && x == 4 /*&& boardfilename[0]*/)
+        else if(PLUTOPAK && x == 4 && boardfilename[0])
                 {
-                    //ud.m_volume_number = 0;
-                    //ud.m_level_number = 7;
+                    ud.m_volume_number = 0;
+                    ud.m_level_number = 7;
             currentlist = 1;
             cmenu(101);
                 }
@@ -1904,17 +1923,17 @@ if (PLUTOPAK)
             menutext(160,60+20+20,SHX(-4),PHX(-4),volume_names[2]);
 if (PLUTOPAK) {
         menutext(160,60+20+20+20,SHX(-5),PHX(-5),volume_names[3]);
-//            if(boardfilename[0])
-//            {
+            if(boardfilename[0])
+            {
                 menutext(160,60+20+20+20+20,SHX(-6),PHX(-6),"USER MAP");
-//                gametextpal(160,60+20+20+20+20+3,boardfilename,16+(sintable[(totalclock<<4)&2047]>>11),2);
-//            }
+                gametextpal(160,60+20+20+20+20+3,boardfilename,16+(sintable[(totalclock<<4)&2047]>>11),2);
+            }
 } else {
-//            if(boardfilename[0])
-//            {
+            if(boardfilename[0])
+            {
                 menutext(160,60+20+20+20,SHX(-6),PHX(-6),"USER MAP");
-//                gametext(160,60+20+20+20+6,boardfilename,2,2+8+16);
-//            }
+                gametext(160,60+20+20+20+6,boardfilename,2,2+8+16);
+            }
 }
 
 }
