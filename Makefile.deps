@@ -1,0 +1,48 @@
+duke3d_h=$(INC)/duke3d.h $(EINC)/build.h $(EINC)/compat.h $(EINC)/cache1d.h $(EINC)/pragmas.h $(EINC)/mmulti.h $(EINC)/baselayer.h $(MACTROOT)/types.h $(MACTROOT)/file_lib.h $(MACTROOT)/util_lib.h $(MACTROOT)/keyboard.h $(MACTROOT)/control.h $(INC)/develop.h $(INC)/gamedefs.h $(INC)/function.h $(INC)/config.h $(INC)/sounds.h $(INC)/rts.h $(INC)/_rts.h $(INC)/soundefs.h $(AUDIOLIBROOT)/include/fx_man.h $(AUDIOLIBROOT)/include/music.h $(INC)/names.h $(INC)/funct.h $(INC)/version.h
+
+$(SRC)/game.$o: $(SRC)/game.c $(MACTROOT)/scriplib.h $(duke3d_h) $(EINC)/osd.h $(INC)/osdfuncs.h $(INC)/osdcmds.h $(INC)/grpscan.h $(INC)/startwin.h
+$(SRC)/actors.$o: $(SRC)/actors.c $(duke3d_h)
+$(SRC)/gamedef.$o: $(SRC)/gamedef.c $(duke3d_h)
+$(SRC)/global.$o: $(SRC)/global.c $(duke3d_h)
+$(SRC)/menues.$o: $(SRC)/menues.c $(duke3d_h) $(MACTROOT)/mouse.h $(MACTROOT)/animlib.h $(EINC)/osd.h
+$(SRC)/player.$o: $(SRC)/player.c $(duke3d_h)
+$(SRC)/premap.$o: $(SRC)/premap.c $(duke3d_h)
+$(SRC)/sector.$o: $(SRC)/sector.c $(duke3d_h)
+$(SRC)/sounds.$o: $(SRC)/sounds.c $(duke3d_h)
+$(SRC)/rts.$o: $(SRC)/rts.c $(duke3d_h)
+$(SRC)/config.$o: $(SRC)/config.c $(duke3d_h) $(MACTROOT)/scriplib.h $(INC)/_functio.h $(EINC)/osd.h
+$(SRC)/winbits.$o: $(SRC)/winbits.c $(EINC)/build.h $(EINC)/compat.h $(EINC)/winlayer.h
+$(SRC)/osdfuncs.$o: $(SRC)/osdfuncs.c $(duke3d_h)
+$(SRC)/osdcmds.$o: $(SRC)/osdcmds.c $(INC)/osdcmds.h $(EINC)/osd.h $(duke3d_h) $(EINC)/crc32.h
+
+$(SRC)/astub.$o: $(SRC)/astub.c $(EINC)/build.h $(EINC)/compat.h $(EINC)/editor.h $(EINC)/pragmas.h $(EINC)/baselayer.h $(EINC)/cache1d.h $(INC)/names.h
+
+$(SRC)/version.$o: $(SRC)/version.c
+$(SRC)/version-auto.$o: $(SRC)/version-auto.c
+
+$(SRC)/grpscan.$o: $(SRC)/grpscan.c $(EINC)/compat.h $(EINC)/baselayer.h $(EINC)/scriptfile.h $(EINC)/cache1d.h $(EINC)/crc32.h $(EINC)/build.h $(INC)/grpscan.h
+$(SRC)/gameres.$(res): $(SRC)/gameres.rc $(INC)/gameres.h $(INC)/version.h $(RSRC)/game.bmp $(RSRC)/game_icon.ico $(RSRC)/game_icon2.ico
+$(SRC)/buildres.$(res): $(SRC)/buildres.rc $(EINC)/buildres.h $(RSRC)/build.bmp $(RSRC)/build_icon.ico
+$(SRC)/startwin_game.$o: $(SRC)/startwin_game.c $(EINC)/compat.h $(EINC)/winlayer.h $(EINC)/build.h $(INC)/startwin.h $(INC)/grpscan.h $(INC)/gameres.h $(INC)/version.h
+$(SRC)/startgtk_game.$o: $(SRC)/startgtk_game.c $(EINC)/compat.h $(EINC)/baselayer.h $(EINC)/build.h $(INC)/startwin.h $(INC)/grpscan.h
+
+# Derived source files from art assets
+$(RSRC)/startgtk_game_gresource.c: $(RSRC)/startgtk_game.gresource.xml $(RSRC)/game.png $(RSRC)/startgtk_game.glade
+$(RSRC)/startgtk_game_gresource.h: $(RSRC)/startgtk_game.gresource.xml
+$(RSRC)/startgtk_build_gresource.c: $(RSRC)/startgtk_build.gresource.xml $(RSRC)/build.png $(RSRC)/startgtk_build.glade
+$(RSRC)/startgtk_build_gresource.h: $(RSRC)/startgtk_build.gresource.xml
+$(RSRC)/sdlappicon_game.c: $(RSRC)/game.png
+$(RSRC)/sdlappicon_game.$o: $(RSRC)/sdlappicon_game.c
+$(RSRC)/sdlappicon_build.c: $(RSRC)/build.png
+$(RSRC)/sdlappicon_build.$o: $(RSRC)/sdlappicon_build.c
+
+# jMACT objects
+$(MACTROOT)/animlib.$o: $(MACTROOT)/animlib.c $(MACTROOT)/types.h $(MACTROOT)/develop.h $(MACTROOT)/util_lib.h $(MACTROOT)/animlib.h $(EINC)/compat.h
+$(MACTROOT)/util_lib.$o: $(MACTROOT)/util_lib.c $(MACTROOT)/util_lib.h $(MACTROOT)/types.h $(EINC)/compat.h $(EINC)/baselayer.h
+$(MACTROOT)/file_lib.$o: $(MACTROOT)/file_lib.c $(MACTROOT)/file_lib.h $(MACTROOT)/types.h $(MACTROOT)/util_lib.h $(EINC)/compat.h $(EINC)/cache1d.h
+$(MACTROOT)/control.$o: $(MACTROOT)/control.c $(MACTROOT)/types.h $(MACTROOT)/control.h $(MACTROOT)/_control.h $(MACTROOT)/keyboard.h $(MACTROOT)/mouse.h $(MACTROOT)/util_lib.h $(EINC)/build.h $(EINC)/compat.h $(EINC)/baselayer.h $(EINC)/pragmas.h
+$(MACTROOT)/keyboard.$o: $(MACTROOT)/keyboard.c $(MACTROOT)/types.h $(MACTROOT)/keyboard.h $(MACTROOT)/control.h $(EINC)/compat.h
+$(MACTROOT)/mouse.$o: $(MACTROOT)/mouse.c $(MACTROOT)/types.h $(MACTROOT)/mouse.h $(MACTROOT)/control.h $(EINC)/compat.h
+$(MACTROOT)/mathutil.$o: $(MACTROOT)/mathutil.c $(MACTROOT)/types.h
+$(MACTROOT)/scriplib.$o: $(MACTROOT)/scriplib.c $(MACTROOT)/scriplib.h $(MACTROOT)/file_lib.h $(MACTROOT)/util_lib.h $(MACTROOT)/_scrplib.h $(MACTROOT)/types.h $(EINC)/compat.h
+
