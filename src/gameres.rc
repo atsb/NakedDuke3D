@@ -32,9 +32,9 @@ FONT 8, "MS Shell Dlg", 0, 0, 1
     CONTROL         "", IDC_STARTWIN_TABCTL, WC_TABCONTROL, WS_TABSTOP | WS_CLIPSIBLINGS, 87, 7, 257, 180, WS_EX_LEFT | WS_EX_CONTROLPARENT
     AUTOCHECKBOX    "&Always show configuration on start", IDC_ALWAYSSHOW, 12, 202, 140, 8, WS_TABSTOP, WS_EX_LEFT
     CONTROL         IDB_BMP, IDC_STATIC, WC_STATIC, SS_BITMAP, 22, 7, 43, 39, WS_EX_LEFT
-    CTEXT           "JFDuke3D", IDC_STARTWIN_APPTITLE, 12, 52, 65, 15, SS_CENTER, WS_EX_LEFT
+    CTEXT           "NakedDuke3D", IDC_STARTWIN_APPTITLE, 12, 52, 65, 15, SS_CENTER, WS_EX_LEFT
     LTEXT           "Version xxxxxxx\nDate", IDC_STARTWIN_APPVERSION, 12, 150, 65, 18, 0, WS_EX_LEFT
-    CONTROL         "<A HREF=""http://www.jonof.id.au/jfduke3d"">Website</A>", IDC_STARTWIN_APPLINK, WC_LINK, WS_TABSTOP, 12, 175, 65, 15, WS_EX_LEFT
+    CONTROL         "<A HREF=""None"">Website</A>", IDC_STARTWIN_APPLINK, WC_LINK, WS_TABSTOP, 12, 175, 65, 15, WS_EX_LEFT
 }
 
 
@@ -140,12 +140,12 @@ FILESUBTYPE VFT2_UNKNOWN
     {
         BLOCK "080904e4"
         {
-            VALUE "CompanyName", "http://jonof.id.au"
-            VALUE "FileDescription", "JFDuke3D"
+            VALUE "CompanyName", "Gibbon"
+            VALUE "FileDescription", "NakedDuke3D"
             VALUE "FileVersion", __DATE__ " " __TIME__
             VALUE "InternalName", "duke3d.exe"
             VALUE "OriginalFilename", "duke3d.exe"
-            VALUE "ProductName", "JFDuke3D"
+            VALUE "ProductName", "NakedDuke3D"
             VALUE "ProductVersion", __DATE__ " " __TIME__
             VALUE "LegalCopyright", "See GPL.TXT for terms"
         }

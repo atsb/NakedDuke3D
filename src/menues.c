@@ -1662,7 +1662,7 @@ cheat_for_port_credits:
 
                    for (i=0;i<2;i++) {
                        switch (i) {
-                           case 0: p = "Visit http://www.jonof.id.au/jfduke3d for"; break;
+                           case 0: p = "Visit github.com/atsb/NakedDuke3D for"; break;
                            case 1: p = "the source code, latest news, and updates of this port."; break;
                        }
                        minitext(160-(Bstrlen(p)<<1), 135+10+(i*7)-l, p, 8, 10+16+128);

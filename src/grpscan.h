@@ -2,7 +2,7 @@
 /*
  Copyright (C) 2013 Jonathon Fowler <jf@jonof.id.au>
 
- This file is part of JFDuke3D
+ This file is part of NakedDuke3D
 
  Duke Nukem 3D is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License

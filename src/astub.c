@@ -1897,7 +1897,7 @@ int ExtInit(void)
     wm_msgbox("Build Editor for Duke Nukem 3D", msg);
     */
 
-	wm_setapptitle("BUILD Editor for JFDuke3D");
+	wm_setapptitle("BUILD Editor for NakedDuke3D");
 
 #if defined(DATADIR)
     {
@@ -1921,7 +1921,7 @@ int ExtInit(void)
 
         // the global support files directory
         if (supportdir) {
-            Bsnprintf(dirpath, sizeof(dirpath), "%s/JFDuke3D", supportdir);
+            Bsnprintf(dirpath, sizeof(dirpath), "%s/NakedDuke3D", supportdir);
             addsearchpath(dirpath);
             free(supportdir);
         }
@@ -1943,9 +1943,9 @@ int ExtInit(void)
         if ((supportdir = Bgetsupportdir(FALSE))) {
             Bsnprintf(dirpath, sizeof(dirpath), "%s/"
 #if defined(_WIN32) || defined(__APPLE__)
-                "JFDuke3D"
+                "NakedDuke3D"
 #else
-                ".jfduke3d"
+                ".nakedduke3d"
 #endif
             , supportdir);
             asperr = addsearchpath(dirpath);

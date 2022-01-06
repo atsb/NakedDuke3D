@@ -2101,7 +2101,7 @@ void gameexit(const char *t)
     if(*t != 0)
     {
         if (!(t[0] == ' ' && t[1] == 0)) {
-            wm_msgbox("JFDuke3D", "%s", t);
+            wm_msgbox("NakedDuke3D", "%s", t);
         }
     }
 
@@ -6932,7 +6932,7 @@ void comlinehelp(void)
         ARGCHAR "nosetup\t\tPrevents display of the configuration dialogue box\n"
         ARGCHAR "net\t\tNet mode game (see documentation)\n"
         ;
-    wm_msgbox("JFDuke3D", "%s", s);
+    wm_msgbox("NakedDuke3D", "%s", s);
 }
 
 void checkcommandline(int argc, char const * const *argv)
@@ -7676,7 +7676,7 @@ int app_main(int argc, char const * const argv[])
 
 #ifdef RENDERTYPEWIN
     if (win_checkinstance()) {
-        if (!wm_ynbox("JFDuke3D","Another Build game is currently running. "
+        if (!wm_ynbox("NakedDuke3D","Another Build game is currently running. "
                     "Do you wish to continue starting this copy?"))
             return 0;
     }
@@ -7704,7 +7704,7 @@ int app_main(int argc, char const * const argv[])
 
         // the global support files directory
         if (supportdir) {
-            Bsnprintf(dirpath, sizeof(dirpath), "%s/JFDuke3D", supportdir);
+            Bsnprintf(dirpath, sizeof(dirpath), "%s/NakedDuke3D", supportdir);
             addsearchpath(dirpath);
             free(supportdir);
         }
@@ -7740,9 +7740,9 @@ int app_main(int argc, char const * const argv[])
         if ((supportdir = Bgetsupportdir(FALSE))) {
             Bsnprintf(dirpath, sizeof(dirpath), "%s/"
 #if defined(_WIN32) || defined(__APPLE__)
-                "JFDuke3D"
+                "NakedDuke3D"
 #else
-                ".jfduke3d"
+                ".nakedduke3d"
 #endif
             , supportdir);
             asperr = addsearchpath(dirpath);
@@ -7762,8 +7762,8 @@ int app_main(int argc, char const * const argv[])
 
     buildsetlogfile("duke3d.log");
 
-    wm_setapptitle("JFDuke3D");
-    buildprintf("\nJFDuke3D\n"
+    wm_setapptitle("NakedDuke3D");
+    buildprintf("\NakedDuke3D\n"
         "Based on Duke Nukem 3D by 3D Realms Entertainment.\n"
         "Additional improvements by Jonathon Fowler (http://www.jonof.id.au) and other contributors.\n"
         "See GPL.TXT for license terms.\n\n"

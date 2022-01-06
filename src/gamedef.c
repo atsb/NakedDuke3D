@@ -1646,7 +1646,7 @@ void loadefs(const char *filenam)
             gameexit("\nMissing con file(s).");
         else {
             const char *msgfmt = "CON file \"%s\" was not found.\n\n"
-                "Check that the \"%s\" file is in the JFDuke3D directory "
+                "Check that the \"%s\" file is in the NakedDuke3D directory "
                 "and try running the game again.";
             int bufsz = strlen(msgfmt) + strlen(filenam) + strlen(duke3dgrp);
             char *msg = Bmalloc(bufsz+1);

@@ -2,7 +2,7 @@
 /*
  Copyright (C) 2007-2021 Jonathon Fowler <jf@jonof.id.au>
 
- This file is part of JFDuke3D
+ This file is part of NakedDuke3D
 
  Duke Nukem 3D is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -500,7 +500,7 @@ static void on_importinfobutton_clicked(GtkButton *button, gpointer user_data)
 
     dialog = gtk_message_dialog_new(startwin, GTK_DIALOG_DESTROY_WITH_PARENT,
         GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-        "JFDuke3D can scan locations of your choosing for Duke Nukem 3D game data");
+        "NakedDuke3D can scan locations of your choosing for Duke Nukem 3D game data");
     gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog),
         "Click the 'Choose a location...' button, then locate a folder to scan.\n\n"
         "Common locations to check include:\n"

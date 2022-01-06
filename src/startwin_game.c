@@ -2,7 +2,7 @@
 /*
  Copyright (C) 2007-2021 Jonathon Fowler <jf@jonof.id.au>
 
- This file is part of JFDuke3D
+ This file is part of NakedDuke3D
 
  Duke Nukem 3D is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -481,7 +481,7 @@ static INT_PTR CALLBACK importinfo_dlgproc(HWND hwndDlg, UINT uMsg, WPARAM wPara
             HWND hwnd;
 
             SetDlgItemText(hwndDlg, IDC_IMPORTINFO_HEADER,
-                "JFDuke3D can scan locations of your choosing for Duke Nukem 3D game data");
+                "NakedDuke3D can scan locations of your choosing for Duke Nukem 3D game data");
             SetDlgItemText(hwndDlg, IDC_IMPORTINFO_TEXT,
                 "Click the 'Choose a location...' button, then locate a folder to scan.\n\n"
                 "Common locations to check include:\n"

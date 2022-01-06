@@ -2,7 +2,7 @@
 /*
  Copyright (C) 2013-2021 Jonathon Fowler <jf@jonof.id.au>
 
- This file is part of JFDuke3D
+ This file is part of NakedDuke3D
 
  Duke Nukem 3D is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -374,7 +374,7 @@ static int importmeta_cancelled(void *data);
         NSURL *sharewareurl = [NSURL URLWithString:@"https://www.jonof.id.au/files/jfduke3d/dn3dsw13.zip"];
 
         [alert setAlertStyle:NSAlertStyleInformational];
-        [alert setMessageText:@"JFDuke3D can scan locations of your choosing for Duke Nukem 3D game data"];
+        [alert setMessageText:@"NakedDuke3D can scan locations of your choosing for Duke Nukem 3D game data"];
         [alert setInformativeText:@"Click the 'Choose a location...' button, then locate "
             @"a .grp file, an .app bundle, or a folder to scan.\n\n"
             @"Common locations to check include:\n"
