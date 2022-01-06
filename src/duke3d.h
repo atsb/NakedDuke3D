@@ -562,9 +562,6 @@ extern int stereomode, stereowidth, stereopixelwidth;
 
 extern int myaimmode, myaimstat, omyaimstat;
 
-#define IFISGLMODE if (POLYMOST_RENDERMODE_POLYGL())
-#define IFISSOFTMODE if (!POLYMOST_RENDERMODE_POLYGL())
-
 void onvideomodechange(int newmode);
 
 #define TILE_SAVESHOT (MAXTILES-1)

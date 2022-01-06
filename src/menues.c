@@ -163,9 +163,6 @@ int loadpheader(char spot,struct savehead *saveh)
     if (waloff[TILE_LOADSHOT] == 0) allocache((void **)&waloff[TILE_LOADSHOT],320*200,&walock[TILE_LOADSHOT]);
     tilesizx[TILE_LOADSHOT] = 200; tilesizy[TILE_LOADSHOT] = 320;
     if (kdfread((char *)waloff[TILE_LOADSHOT],320,200,fil) != 200) goto corrupt;
-#if USE_POLYMOST && USE_OPENGL
-    invalidatetile(TILE_LOADSHOT,0,255);
-#endif
 
     kclose(fil);
 
@@ -1616,7 +1613,6 @@ cheat_for_port_credits:
                    p = "Jonathon \"JonoF\" Fowler";
                    minitext(160-(Bstrlen(p)<<1), 40+10-l, p, 12, 10+16+128);
                    
-                   gametext(160,60-l,"\"POLYMOST\" 3D RENDERER",0,2+8+16);
                    gametext(160,60+8-l,"NETWORKING, OTHER CODE",0,2+8+16);
                    p = "Ken \"Awesoken\" Silverman";
                    minitext(160-(Bstrlen(p)<<1), 60+8+10-l, p, 12, 10+16+128);
@@ -2369,11 +2365,7 @@ if (PLUTOPAK) {
             changesmade = 0;
 
             c = (320>>1)-120;
-#if USE_POLYMOST && USE_OPENGL
-            i = 7;
-#else
             i = 5;
-#endif
             onbar = (probey == 4);
             if (probey <= 2)
                 x = probe(c+6,50,16,i);
@@ -2439,26 +2431,6 @@ if (PLUTOPAK) {
 
                 case 4: // Brightness.
                     break;
-
-#if USE_POLYMOST && USE_OPENGL
-                case 5: // Filtering.
-                    if (bpp==8) break;
-                    switch (gltexfiltermode) {
-                        case 0: gltexfiltermode = 3; break;
-                        case 3: gltexfiltermode = 5; break;
-                        case 5: gltexfiltermode = 0; break;
-                        default: gltexfiltermode = 3; break;
-                    }
-                    gltexapplyprops();
-                    break;
-
-                case 6: // Anisotropy.
-                    if (bpp==8) break;
-                    glanisotropy *= 2;
-                    if (glanisotropy > glinfo.maxanisotropy) glanisotropy = 1;
-                    gltexapplyprops();
-                    break;
-#endif
             }
             if (changesmade) {
                 // Find the next/prev video mode matching the new vidset.
@@ -2511,22 +2483,6 @@ if (PLUTOPAK) {
                 setbrightness(ud.brightness>>2,&ps[myconnectindex].palette[0],0);
             }
         }
-
-#if USE_POLYMOST && USE_OPENGL
-        menutext(c,50+62+16+16,0,bpp==8,"FILTERING");
-            switch (gltexfiltermode) {
-                case 0: strcpy(buf,"NEAREST"); break;
-                case 3: strcpy(buf,"BILINEAR"); break;
-                case 5: strcpy(buf,"TRILINEAR"); break;
-                default: strcpy(buf,"OTHER"); break;
-            }
-            menutext(c+154,50+62+16+16,0,bpp==8,buf);
-
-        menutext(c,50+62+16+16+16,0,bpp==8,"ANISOTROPY");
-            if (glanisotropy == 1) strcpy(buf,"NONE");
-            else sprintf(buf,"%d-tap",glanisotropy);
-            menutext(c+154,50+62+16+16+16,0,bpp==8,buf);
-#endif
         break;
 
     case 204:
@@ -4530,9 +4486,6 @@ void playanm(const char *fn,char t)
         else                           ototalclock += 10;
 
         waloff[TILE_ANIM] = (intptr_t)(ANIM_DrawFrame(i));
-#if USE_POLYMOST && USE_OPENGL
-        invalidatetile(TILE_ANIM, 0, 1<<4);  // JBF 20031228
-#endif
         clearallviews(0);
         rotatesprite(0<<16,0<<16,65536L,512,TILE_ANIM,0,0,2+4+8+16+64, 0,0,xdim-1,ydim-1);
         nextpage();

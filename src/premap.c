@@ -45,15 +45,9 @@ static void tloadtile(short tilenume, char type)
             j = tilenume + (picanm[tilenume]&63);
         }
         for (;i<=j;i++) {
-#if USE_POLYMOST && USE_OPENGL
-            if (useprecache) polymost_precache(tilenume, 0, type);
-#endif
             gotpic[i>>3] |= pow2char[i&7];
         }
     } else {
-#if USE_POLYMOST && USE_OPENGL
-        if (useprecache) polymost_precache(tilenume, 0, type);
-#endif
         gotpic[tilenume>>3] |= pow2char[tilenume&7];
     }
 }
@@ -285,9 +279,6 @@ void cacheit(void)
     unsigned int starttime, endtime;
 
     starttime = getticks();
-#if USE_POLYMOST && USE_OPENGL
-    polymost_precache_begin();
-#endif
 
     precachenecessarysounds();
 
@@ -321,44 +312,6 @@ void cacheit(void)
         }
     }
 
-#if USE_POLYMOST && USE_OPENGL
-    if (useprecache) {
-        int cycles = 0;
-        int done, total, percent;
-        int lastdone = -1, lasttotal = -1, lastpercent = -1, lastclock, firstclock;
-
-        firstclock = lastclock = totalclock;
-        while (polymost_precache_run(&done, &total)) {
-            if (total == 0) {
-                break;
-            }
-            if (done == lastdone && total == lasttotal && (cycles++ & 1023) > 0) {
-                continue;
-            }
-            handleevents();
-            getpackets();
-
-            if (totalclock - firstclock < TICRATE*5) {
-                continue;
-            }
-
-            lastdone = done;
-            lasttotal = total;
-            percent = done * 100 / total;
-
-            if (percent == lastpercent || totalclock - lastclock < TICRATE/10) {
-                continue;
-            }
-
-            lastpercent = percent;
-            lastclock = totalclock;
-
-            sprintf(buf,"Loading textures ... %d%%\n",percent);
-            dofrontscreens(buf);
-        }
-    }
-#endif
-
     j = 0;
     for(i=0;i<MAXTILES;i++) {
         if(gotpic[i>>3] & pow2char[i&7]) {
@@ -390,9 +343,6 @@ void xyzmirror(short i,short wn)
 
     setviewback();
     squarerotatetile(wn);
-#if USE_POLYMOST && USE_OPENGL
-    invalidatetile(wn,-1,255);
-#endif
 }
 
 void vscrn(void)

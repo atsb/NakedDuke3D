@@ -68,7 +68,7 @@ void GAME_clearbackground(int UNUSED(c), int r)
     int x, y, xsiz, ysiz, tx2, ty2;
     int daydim, bits;
 
-    if (!POLYMOST_RENDERMODE_POLYGL()) bits = BITS; else bits = BITSTL;
+    bits = BITS;
 
     daydim = r<<3;
 
