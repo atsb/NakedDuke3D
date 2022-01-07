@@ -221,7 +221,7 @@ short aim(spritetype *s,short aang)
     a = s->ang;
 
     j = -1;
-    if(s->picnum == APLAYER && !ps[s->yvel].auto_aim) return -1;
+//    if(s->picnum == APLAYER && ps[s->yvel].aim_mode) return -1;
 
     gotshrinker = s->picnum == APLAYER && ps[s->yvel].curr_weapon == SHRINKER_WEAPON;
     gotfreezer = s->picnum == APLAYER && ps[s->yvel].curr_weapon == FREEZE_WEAPON;
@@ -691,59 +691,8 @@ void shoot(short i,short atwith)
                         spawn(k,SMALLSMOKE);
                     else sprite[k].xrepeat = sprite[k].yrepeat = 0;
                 }
-                else if( hitwall >= 0 ) {
-			// JBF 20040110: This allows bullet holes to appear from non-player shots.
-			// Ken warns me that this will/may have evil effects on sync so until I can
-			// verify otherwise, I'm disabling it.
-#if 0
-                    if( isadoorwall(wall[hitwall].picnum) == 1 )
-                        goto SKIPBULLETHOLE2;
-
-                    if(wall[hitwall].hitag != 0 || ( wall[hitwall].nextwall >= 0 && wall[wall[hitwall].nextwall].hitag != 0 ) )
-                        goto SKIPBULLETHOLE2;
-
-                    if( hitsect >= 0 && sector[hitsect].lotag == 0 )
-                        if( wall[hitwall].overpicnum != BIGFORCE )
-                            if( (wall[hitwall].nextsector >= 0 && sector[wall[hitwall].nextsector].lotag == 0 ) ||
-                                ( wall[hitwall].nextsector == -1 && sector[hitsect].lotag == 0 ) )
-                                    if( (wall[hitwall].cstat&16) == 0)
-                    {
-                        if(wall[hitwall].nextsector >= 0)
-                        {
-                            l = headspritesect[wall[hitwall].nextsector];
-                            while(l >= 0)
-                            {
-                                if(sprite[l].statnum == 3 && sprite[l].lotag == 13)
-                                    goto SKIPBULLETHOLE2;
-                                l = nextspritesect[l];
-                            }
-                        }
-
-                        l = headspritestat[5];
-                        while(l >= 0)
-                        {
-                            if(sprite[l].picnum == BULLETHOLE)
-                                if(dist(&sprite[l],&sprite[k]) < (12+(TRAND&7)) )
-                                    goto SKIPBULLETHOLE2;
-                            l = nextspritestat[l];
-                        }
-                        l = spawn(k,BULLETHOLE);
-                        sprite[l].xvel = -1;
-                        sprite[l].ang = getangle(wall[hitwall].x-wall[wall[hitwall].point2].x,
-                            wall[hitwall].y-wall[wall[hitwall].point2].y)+512;
-                        ssp(l,CLIPMASK0);
-                    }
-
-                    SKIPBULLETHOLE2:
-
-                    if( wall[hitwall].cstat&2 )
-                        if(wall[hitwall].nextsector >= 0)
-                            if(hitz >= (sector[wall[hitwall].nextsector].floorz) )
-                                hitwall = wall[hitwall].nextwall;
-#endif
-			// JBF 20040110: end
+                else if( hitwall >= 0 )
                     checkhitwall(k,hitwall,hitx,hity,hitz,SHOTSPARK1);
-		}
             }
 
             if( (TRAND&255) < 4 )
@@ -1138,18 +1087,14 @@ void shoot(short i,short atwith)
             if( s->extra >= 0 ) s->shade = -96;
             if(p >= 0)
             {
-				if (NAM) {
-					zvel = (100-ps[p].horiz-ps[p].horizoff)*98;
-				} else {
-					j = aim( s, AUTO_AIM_ANGLE );
-					if(j >= 0)
-					{
-						dal = ((sprite[j].xrepeat*tilesizy[sprite[j].picnum])<<1);
-						zvel = ( (sprite[j].z-sz-dal-(4<<8))*768) / (ldist( &sprite[ps[p].i], &sprite[j]));
-						sa = getangle(sprite[j].x-sx,sprite[j].y-sy);
-					}
-					else zvel = (100-ps[p].horiz-ps[p].horizoff)*98;
-				}
+                j = aim( s, AUTO_AIM_ANGLE );
+                if(j >= 0)
+                {
+                    dal = ((sprite[j].xrepeat*tilesizy[sprite[j].picnum])<<1);
+                    zvel = ( (sprite[j].z-sz-dal-(4<<8))*768) / (ldist( &sprite[ps[p].i], &sprite[j]));
+                    sa = getangle(sprite[j].x-sx,sprite[j].y-sy);
+                }
+                else zvel = (100-ps[p].horiz-ps[p].horizoff)*98;
             }
             else if(s->statnum != 3)
             {
@@ -1656,22 +1601,6 @@ void displayweapon(short snum)
                     myospal(124+((*kb)<<1)-(p->look_ang>>1),looking_arc+430-gun_pos-((*kb)<<3),FIRSTGUN+6,gs,o,pal);
                     myospal(224-(p->look_ang>>1),looking_arc+220-gun_pos,FIRSTGUN+5,gs,o,pal);
                 }
-				else if (NAM)
-				{
-#define WEAPON2_RELOAD_TIME 50
-					if((*kb) < (WEAPON2_RELOAD_TIME - 12))
-					{
-						myospal(184-(p->look_ang>>1),looking_arc+235-gun_pos,FIRSTGUN+8,gs,o,pal);
-						myospal(224-(p->look_ang>>1),looking_arc+210-gun_pos,FIRSTGUN+5,gs,o,pal);
-					}
-					else if((*kb) < (WEAPON2_RELOAD_TIME - 6))
-					{
-						myospal(164-(p->look_ang>>1),looking_arc+245-gun_pos,FIRSTGUN+8,gs,o,pal);
-						myospal(224-(p->look_ang>>1),looking_arc+220-gun_pos,FIRSTGUN+5,gs,o,pal);
-					}
-					else if((*kb) < (WEAPON2_RELOAD_TIME) )
-						myospal(194-(p->look_ang>>1),looking_arc+235-gun_pos,FIRSTGUN+5,gs,o,pal);
-				}
                 else if((*kb) < 23)
                 {
                     myospal(184-(p->look_ang>>1),looking_arc+235-gun_pos,FIRSTGUN+8,gs,o,pal);
@@ -1899,38 +1828,6 @@ void getinput(short snum)
           }
 	}
 
-	{
-		int32 i;
-		if (myaimmode) i = analog_lookingupanddown;
-		else i = MouseAnalogueAxes[1];
-
-		if (i != mouseyaxismode) {
-			CONTROL_MapAnalogAxis(1, i, controldevice_mouse);
-			mouseyaxismode = i;
-		}
-	}
-
-    CONTROL_GetInput( &info );
-
-	info.dx += lastinfo.dx;
-	info.dy += lastinfo.dy;
-	info.dz += lastinfo.dz;
-	info.dyaw   += lastinfo.dyaw;
-	info.dpitch += lastinfo.dpitch;
-	info.droll  += lastinfo.droll;
-	memset(&lastinfo, 0, sizeof(lastinfo));
-
-    tics = totalclock-lastcontroltime;
-    lastcontroltime = totalclock;
-    
-#ifdef WITHMAPDUMPSLASH
-    // JBF: Map dump hack
-    if (KB_KeyDown[sc_BackSlash]) {
-	saveboard("jonof.map",&ps[snum].posx,&ps[snum].posy,&ps[snum].posz,&ps[snum].ang,&ps[snum].cursectnum);
-	KB_KeyDown[sc_BackSlash] = 0;
-    }
-#endif
-
     if(multiflag == 1)
     {
         loc.bits =   1<<17;
@@ -2000,12 +1897,8 @@ if (!VOLUMEONE) {
     loc.bits |=   BUTTON(gamefunc_Inventory)<<30;
     loc.bits |=   KB_KeyPressed(sc_Escape)<<31;
 
-    // JBF: Run key behaviour is selectable
-    if (ud.runkey_mode) {
-	running = BUTTON(gamefunc_Run)|ud.auto_run;	// classic
-    } else {
-	running = ud.auto_run ^ BUTTON(gamefunc_Run);	// modern
-    }
+    running = BUTTON(gamefunc_Run)|ud.auto_run;
+
     svel = vel = angvel = horiz = 0;
 
 	if( BUTTON(gamefunc_Strafe) ) {
@@ -2549,7 +2442,7 @@ void processinput(short snum)
         }
     }
   */
-    if(p->pals_time >= 0)	// JBF 20040101: was > 0
+    if(p->pals_time > 0)
         p->pals_time--;
 
     if(p->fta > 0)
@@ -2700,7 +2593,7 @@ void processinput(short snum)
         p->ang =  SA;
         p->posxv = p->posyv = s->xvel = 0;
         p->look_ang = 0;
-	p->rotscrnang = 0;
+		p->rotscrnang = 0;
 
         doincrements(p);
 
@@ -3229,7 +3122,8 @@ void processinput(short snum)
 
         k = sintable[p->bobcounter&2047]>>12;
 
-        if(truefdist < PHEIGHT+(8<<8) && ( k == 1 || k == 3 ))
+        if(truefdist < PHEIGHT+(8<<8) )
+            if( k == 1 || k == 3 )
         {
             if(p->spritebridge == 0 && p->walking_snd_toggle == 0 && p->on_ground)
             {
@@ -3385,7 +3279,6 @@ void processinput(short snum)
                 activatebysector(psect,pi);
         }
 
-		i = 0;
         if( sb_snum&(1<<18) || p->hard_landing)
             p->return_to_center = 9;
 
@@ -3394,7 +3287,6 @@ void processinput(short snum)
             p->return_to_center = 9;
             if( sb_snum&(1<<5) ) p->horiz += 12;
             p->horiz += 12;
-			i++;
         }
 
         else if( sb_snum&(1<<14) )
@@ -3402,43 +3294,39 @@ void processinput(short snum)
             p->return_to_center = 9;
             if( sb_snum&(1<<5) ) p->horiz -= 12;
             p->horiz -= 12;
-			i++;
         }
 
         else if( sb_snum&(1<<3) )
         {
             if( sb_snum&(1<<5) ) p->horiz += 6;
             p->horiz += 6;
-			i++;
         }
 
         else if( sb_snum&(1<<4) )
         {
             if( sb_snum&(1<<5) ) p->horiz -= 6;
             p->horiz -= 6;
-			i++;
         }
         if(p->return_to_center > 0)
             if( (sb_snum&(1<<13)) == 0 && (sb_snum&(1<<14)) == 0 )
         {
             p->return_to_center--;
             p->horiz += 33-(p->horiz/3);
-			i++;
         }
 
         if(p->hard_landing > 0)
         {
             p->hard_landing--;
             p->horiz -= (p->hard_landing<<4);
-			i++;
         }
 
-        if(i)
+        if(p->aim_mode)
+            p->horiz += sync[snum].horz>>1;
+        else
         {
              if( p->horiz > 95 && p->horiz < 105) p->horiz = 100;
              if( p->horizoff > -5 && p->horizoff < 5) p->horizoff = 0;
         }
-        p->horiz += sync[snum].horz/2;//>>1;
 
         if(p->horiz > 299) p->horiz = 299;
         else if(p->horiz < -99) p->horiz = -99;
@@ -3448,7 +3336,7 @@ void processinput(short snum)
     if( p->show_empty_weapon > 0)
     {
         p->show_empty_weapon--;
-        if(p->show_empty_weapon == 0 && (p->weaponswitch & 2))
+        if(p->show_empty_weapon == 0)
         {
             if(p->last_full_weapon == GROW_WEAPON)
                 p->subweapon |= (1<<GROW_WEAPON);
@@ -3534,24 +3422,6 @@ void processinput(short snum)
     // HACKS
 
     SHOOTINCODE:
-	if (NAM) {
-		// reload clip
-		if( sb_snum & (1<<19) ) // 'Holster Weapon
-		{
-			if( p->curr_weapon == PISTOL_WEAPON)
-			{
-				if( p->ammo_amount[PISTOL_WEAPON] > 20)
-				{
-					// throw away the remaining clip
-					p->ammo_amount[PISTOL_WEAPON]-=
-							   p->ammo_amount[PISTOL_WEAPON] % 20;
-					(*kb) = 3;	// animate, but don't shoot...
-					sb_snum &= ~(1<<2); // not firing...
-				}
-				return;
-			}
-		}
-	}
 
     if( p->curr_weapon == SHRINKER_WEAPON || p->curr_weapon == GROW_WEAPON )
         p->random_club_frame += 64; // Glowing
@@ -3730,15 +3600,6 @@ void processinput(short snum)
                         p->posz,HEAVYHBOMB,-16,9,9,
                         p->ang,(k+(p->hbomb_hold_delay<<5)),i,pi,1);
 
-					if (NAM) {
-						int lGrenadeLifetime=NAM_GRENADE_LIFETIME;
-						int lGrenadeLifetimeVar=NAM_GRENADE_LIFETIME_VAR;
-						// set timer.  blows up when at zero....
-						sprite[j].extra=lGrenadeLifetime	// FIXME: bug
-								+ mulscale14(krand(),lGrenadeLifetimeVar)
-								- lGrenadeLifetimeVar;
-					}
-
                     if(k == 15)
                     {
                         sprite[j].yvel = 3;
@@ -3761,14 +3622,9 @@ void processinput(short snum)
                 else if( (*kb) > 19 )
                 {
                     (*kb) = 0;
-					if (NAM) {
-						// don't change to remote when in NAM: grenades are timed
-						checkavailweapon(p);
-					} else {
-	                    p->curr_weapon = HANDREMOTE_WEAPON;
-    	                p->last_weapon = -1;
-        	            p->weapon_pos = 10;
-					}
+                    p->curr_weapon = HANDREMOTE_WEAPON;
+                    p->last_weapon = -1;
+                    p->weapon_pos = 10;
                 }
 
                 break;
@@ -3786,16 +3642,9 @@ void processinput(short snum)
                 if((*kb) == 10)
                 {
                     (*kb) = 0;
-					if (NAM) {
-						if(p->ammo_amount[TRIPBOMB_WEAPON] > 0)
-							addweapon(p,TRIPBOMB_WEAPON);
-						else
-							checkavailweapon(p);
-					} else {
-	                    if(p->ammo_amount[HANDBOMB_WEAPON] > 0)
-    	                    addweapon(p,HANDBOMB_WEAPON);
-        	            else checkavailweapon(p);
-					}
+                    if(p->ammo_amount[HANDBOMB_WEAPON] > 0)
+                        addweapon(p,HANDBOMB_WEAPON);
+                    else checkavailweapon(p);
                 }
                 break;
 
@@ -3834,7 +3683,7 @@ void processinput(short snum)
                     }
                 }
 
-                if((*kb) == (NAM?50:27))
+                if((*kb) == 27)
                 {
                     (*kb) = 0;
                     checkavailweapon(p);
@@ -3916,7 +3765,7 @@ void processinput(short snum)
                         p->visibility = 0;
                         checkavailweapon(p);
 
-                        if( ( sb_snum&(1<<2) ) == 0 || p->ammo_amount[CHAINGUN_WEAPON] <= 0 )
+                        if( ( sb_snum&(1<<2) ) == 0 )
                         {
                             *kb = 0;
                             break;
@@ -3936,79 +3785,33 @@ void processinput(short snum)
 
                 if(p->curr_weapon == GROW_WEAPON)
                 {
-					if (NAM) {
-						(*kb)++;
-						if ((*kb) == 3)
-						{
-							// fire now, but don't reload right away...
-							(*kb)++;
-							if(p->ammo_amount[p->curr_weapon]<=1)
-								*kb=0;
-							if( screenpeek == snum ) pus = 1;
-							p->ammo_amount[GROW_WEAPON]--;
-							shoot(pi,GROWSPARK);
-						}
-						if((*kb) > 0)
-						{
-							// reload now...
-							*kb=0;
-							p->visibility = 0;
-							lastvisinc = totalclock+32;
-        	                checkavailweapon(p);
-						}
-						
-					} else {
-						if((*kb) > 3)
-						{
-							*kb = 0;
-							if( screenpeek == snum ) pus = 1;
-							p->ammo_amount[GROW_WEAPON]--;
-							shoot(pi,GROWSPARK);
+                    if((*kb) > 3)
+                    {
+                        *kb = 0;
+                        if( screenpeek == snum ) pus = 1;
+                        p->ammo_amount[GROW_WEAPON]--;
+                        shoot(pi,GROWSPARK);
 
-							p->visibility = 0;
-							lastvisinc = totalclock+32;
-							checkavailweapon(p);
-						}
-						else (*kb)++;
-					}
+                        p->visibility = 0;
+                        lastvisinc = totalclock+32;
+                        checkavailweapon(p);
+                    }
+                    else (*kb)++;
                 }
                 else
                 {
-					if (NAM) {
-						if( (*kb) == 10)
-						{
-							// fire now, but wait for reload...
-							(*kb)++;
+					if( (*kb) > 10)
+                    {
+                        (*kb) = 0;
 
-							p->ammo_amount[SHRINKER_WEAPON]--;
-							shoot(pi,SHRINKER);
+                        p->ammo_amount[SHRINKER_WEAPON]--;
+                        shoot(pi,SHRINKER);
 
-							// make them visible if not set...
-							p->visibility = 0;
-							lastvisinc = totalclock+32;
-						}
-						else if((*kb) > 30)
-						{
-							*kb=0;
-            	            p->visibility = 0;
-                	        lastvisinc = totalclock+32;
-                    	    checkavailweapon(p);
-						}
-						else (*kb)++;
-					} else {
-						if( (*kb) > 10)
-						{
-							(*kb) = 0;
-
-							p->ammo_amount[SHRINKER_WEAPON]--;
-							shoot(pi,SHRINKER);
-
-							p->visibility = 0;
-							lastvisinc = totalclock+32;
-							checkavailweapon(p);
-						}
-						else (*kb)++;
-					}
+                        p->visibility = 0;
+                        lastvisinc = totalclock+32;
+                        checkavailweapon(p);
+                    }
+                    else (*kb)++;
                 }
                 break;
 
@@ -4017,27 +3820,13 @@ void processinput(short snum)
                 {
                     (*kb)++;
 
-					if (NAM) {
-						if( ((*kb) >= 2) &&
-							(*kb) < 5 &&
-							( (*kb) & 1))
-	                    {
-							p->visibility = 0;
-							lastvisinc = totalclock+32;
-	                        shoot(pi,RPG);
-    	                    p->ammo_amount[DEVISTATOR_WEAPON]--;
-        	                checkavailweapon(p);
-            	        }
-						if((*kb) > 5) (*kb) = 0;
-					}
-					else if( (*kb) & 1 )
+                    if( (*kb) & 1 )
                     {
                         p->visibility = 0;
                         lastvisinc = totalclock+32;
                         shoot(pi,RPG);
                         p->ammo_amount[DEVISTATOR_WEAPON]--;
                         checkavailweapon(p);
-						if (p->ammo_amount[DEVISTATOR_WEAPON] <= 0) *kb = 0;
                     }
                     if((*kb) > 5) (*kb) = 0;
                 }
@@ -4060,7 +3849,7 @@ void processinput(short snum)
                 }
                 else
                 {
-                    if( (sb_snum&(1<<2)) && p->ammo_amount[FREEZE_WEAPON] > 0)
+                    if( sb_snum&(1<<2))
                     {
                         *kb = 1;
                         spritesound(CAT_FIRE,pi);
@@ -4207,10 +3996,6 @@ void computergetinput(int snum, input *syn)
 
     if (!(numframes&7))
     {
-        x2 = sprite[ps[goalplayer[snum]].i].x;
-        y2 = sprite[ps[goalplayer[snum]].i].y;
-        z2 = sprite[ps[goalplayer[snum]].i].z;
-	
         if (!cansee(x1,y1,z1-(48<<8),damysect,x2,y2,z2-(48<<8),sprite[ps[goalplayer[snum]].i].sectnum))
             goalplayer[snum] = snum;
     }
