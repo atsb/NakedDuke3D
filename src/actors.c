@@ -120,7 +120,7 @@ void addammo( short weapon,struct player_struct *p,short amount)
         p->ammo_amount[weapon] = max_ammo_amount[weapon];
 }
 
-void addweaponnoswitch( struct player_struct *p, short weapon)
+void addweapon( struct player_struct *p, short weapon)
 {
     if ( p->gotweapon[weapon] == 0 )
     {
@@ -129,21 +129,6 @@ void addweaponnoswitch( struct player_struct *p, short weapon)
             p->gotweapon[GROW_WEAPON] = 1;
     }
 
-    switch(weapon)
-    {
-        case KNEE_WEAPON:
-        case TRIPBOMB_WEAPON:
-        case HANDREMOTE_WEAPON:
-        case HANDBOMB_WEAPON:     break;
-        case SHOTGUN_WEAPON:      spritesound(SHOTGUN_COCK,p->i);break;
-        case PISTOL_WEAPON:       spritesound(INSERT_CLIP,p->i);break;
-        default:      spritesound(SELECT_WEAPON,p->i);break;
-    }
-}
-
-void addweapon( struct player_struct *p,short weapon)
-{
-    addweaponnoswitch(p,weapon);
     p->random_club_frame = 0;
 
     if(p->holster_weapon == 0)
@@ -160,6 +145,24 @@ void addweapon( struct player_struct *p,short weapon)
 
     p->kickback_pic = 0;
     p->curr_weapon = weapon;
+
+    switch(weapon)
+    {
+        case KNEE_WEAPON:
+        case TRIPBOMB_WEAPON:
+        case HANDREMOTE_WEAPON:
+        case HANDBOMB_WEAPON:
+        	break;
+        case SHOTGUN_WEAPON:
+        	spritesound(SHOTGUN_COCK,p->i);
+        	break;
+        case PISTOL_WEAPON:
+        	spritesound(INSERT_CLIP,p->i);
+        	break;
+        default:
+        	spritesound(SELECT_WEAPON,p->i);
+        	break;
+    }
 }
 
 void checkavailinven( struct player_struct *p )
@@ -203,15 +206,14 @@ void checkavailweapon( struct player_struct *p )
     weap = p->curr_weapon;
     if( p->gotweapon[weap] && p->ammo_amount[weap] > 0 )
         return;
-    if( p->gotweapon[weap] && !(p->weaponswitch & 2))
-        return;
-    
+
     snum = sprite[p->i].yvel;
 
     for(i=0;i<10;i++)
     {
         weap = ud.wchoice[snum][i];
-        if (VOLUMEONE && weap > 6) continue;
+        if (VOLUMEONE && weap > 6)
+        	continue;
 
         if(weap == 0) weap = 9;
         else weap--;
@@ -1133,9 +1135,7 @@ void moveplayers(void) //Players
                 s->xvel = 128;
                 s->ang = p->ang;
                 s->extra++;
-                //IFMOVING;     // JBF 20040825: is really "if (ssp(i,CLIPMASK0)) ;" which is probably
-        ssp(i,CLIPMASK0);   // not the safest of ideas because a zealous optimiser probably sees
-                    // it as redundant, so I'll call the "ssp(i,CLIPMASK0)" explicitly.
+                IFMOVING;
             }
             else
             {
@@ -1411,8 +1411,7 @@ void movestandables(void)
                     s->picnum = CRANE+1;
                     s->xvel += 8;
                 }
-                //IFMOVING; // JBF 20040825: see my rant above about this
-        ssp(i,CLIPMASK0);
+                IFMOVING;
                 if(sect == t[1])
                     t[0]++;
             }
@@ -1507,8 +1506,7 @@ void movestandables(void)
                 if( s->xvel < 192 )
                     s->xvel += 8;
                 s->ang = getangle(msx[t[4]]-s->x,msy[t[4]]-s->y);
-                //IFMOVING; // JBF 20040825: see my rant above about this
-        ssp(i,CLIPMASK0);
+                IFMOVING;
                 if( ((s->x-msx[t[4]])*(s->x-msx[t[4]])+(s->y-msy[t[4]])*(s->y-msy[t[4]]) ) < (128*128) )
                     t[0]++;
             }
@@ -1984,9 +1982,7 @@ void movestandables(void)
                 {
                     camsprite = -1;
                     T1 = 0;
-                    //loadtile(s->picnum);
-            //invalidatetile(s->picnum,-1,255);
-            walock[TILE_VIEWSCR] = 199;
+                    loadtile(s->picnum);
                 }
 
                 goto BOLT;
@@ -3701,15 +3697,10 @@ void moveactors(void)
                         {
                             t[0] = -1;
                             x = ldist(s,&sprite[t[5]]);
-                            if(x < 768) {
-                    sprite[t[5]].xrepeat = 0;
-
-                    // JBF 20041129: a slimer eating another enemy really ought
-                    // to decrease the maximum kill count by one.
-                    // JBF 20051024: additionally, the enemy has to be alive for
-                    // the max enemy count to be decremented.
-                    if (sprite[t[5]].extra > 0) ps[myconnectindex].max_actors_killed--;
-                }
+                            if(x < 768)
+                            {
+                            	sprite[t[5]].xrepeat = 0;
+                            }
                         }
                     }
 
@@ -3842,7 +3833,7 @@ void moveactors(void)
 
             case BOUNCEMINE:
             case MORTER:
-                j = spawn(i, (PLUTOPAK ? FRAMEEFFECT1 : FRAMEEFFECT1_13) );
+                j = spawn(i,FRAMEEFFECT1);
                 hittype[j].temp_data[0] = 3;
                 // fall through
 
@@ -3953,20 +3944,8 @@ void moveactors(void)
                 }
 
                 DETONATEB:
-
-        namBoom = 0;
-        if( ( l >= 0 && ps[l].hbomb_on == 0 ) || t[3] == 1)
-            namBoom=1;
-        if (NAM) {
-            if( s->picnum == HEAVYHBOMB)
-            {
-                s->extra--; // FIXME: bug
-                if(s->extra <= 0)
-                    namBoom=1;
-            }
-        }
-
-        if (namBoom)
+                
+                if( ( l >= 0 && ps[l].hbomb_on == 0 ) || t[3] == 1)
                 {
                     t[4]++;
 
@@ -4394,9 +4373,6 @@ void moveexplosions(void)  // STATNUM 5
                     deletesprite(i);
                 goto BOLT;
 
-            case FRAMEEFFECT1_13:
-                if (PLUTOPAK) goto BOLT;    // JBF: ideally this should never happen...
-                // fall through
             case FRAMEEFFECT1:
 
                 if(s->owner >= 0)
@@ -6960,13 +6936,17 @@ void moveeffectors(void)   //STATNUM 3
 
                 wal = &wall[t[2]];
 
-                wal->cstat &= (255-32);
-                wal->cstat |= 16;
-                if(wal->nextwall >= 0)
+                if(wal->cstat|32)
                 {
-                    wall[wal->nextwall].cstat &= (255-32);
-                    wall[wal->nextwall].cstat |= 16;
+                    wal->cstat &= (255-32);
+                    wal->cstat |= 16;
+                    if(wal->nextwall >= 0)
+                    {
+                        wall[wal->nextwall].cstat &= (255-32);
+                        wall[wal->nextwall].cstat |= 16;
+                    }
                 }
+                else break;
 
                 wal->overpicnum++;
                 if(wal->nextwall >= 0)

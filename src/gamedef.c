@@ -2557,8 +2557,7 @@ char parse(void)
         case 23:    //addweapon
             insptr++;
             if( ps[g_p].gotweapon[*insptr] == 0 ) {
-                if (!(ps[g_p].weaponswitch & 1)) addweaponnoswitch(&ps[g_p], *insptr);
-                else addweapon( &ps[g_p], *insptr );
+                addweapon(&ps[g_p], *insptr);
             }
             else if( ps[g_p].ammo_amount[*insptr] >= max_ammo_amount[*insptr] )
             {
