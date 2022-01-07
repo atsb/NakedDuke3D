@@ -1,6 +1,9 @@
 Gibbon's Duke Nukem 3D Port
 ==========================
-Thanks to JFDuke / Jonathon Fowler, with contributions by Ken Silverman and others
+Thanks to JFDuke / Jonathon Fowler, with contributions by Ken Silverman and others.
+
+The goal of this source port is to make Duke3D as close to the original DOS as possible.  I will however, be keeping the Input/Video/Game etc..  options as they are
+in JFDuke3D as a compromise for ease-of-use.
 
 Minimum system requirements
 ---------------------------
