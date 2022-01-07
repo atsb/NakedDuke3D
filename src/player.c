@@ -221,7 +221,7 @@ short aim(spritetype *s,short aang)
     a = s->ang;
 
     j = -1;
-//    if(s->picnum == APLAYER && ps[s->yvel].aim_mode) return -1;
+    if(s->picnum == APLAYER && !ps[s->yvel].auto_aim) return -1;
 
     gotshrinker = s->picnum == APLAYER && ps[s->yvel].curr_weapon == SHRINKER_WEAPON;
     gotfreezer = s->picnum == APLAYER && ps[s->yvel].curr_weapon == FREEZE_WEAPON;
@@ -1087,14 +1087,14 @@ void shoot(short i,short atwith)
             if( s->extra >= 0 ) s->shade = -96;
             if(p >= 0)
             {
-                j = aim( s, AUTO_AIM_ANGLE );
-                if(j >= 0)
-                {
-                    dal = ((sprite[j].xrepeat*tilesizy[sprite[j].picnum])<<1);
-                    zvel = ( (sprite[j].z-sz-dal-(4<<8))*768) / (ldist( &sprite[ps[p].i], &sprite[j]));
-                    sa = getangle(sprite[j].x-sx,sprite[j].y-sy);
-                }
-                else zvel = (100-ps[p].horiz-ps[p].horizoff)*98;
+					j = aim( s, AUTO_AIM_ANGLE );
+					if(j >= 0)
+					{
+						dal = ((sprite[j].xrepeat*tilesizy[sprite[j].picnum])<<1);
+						zvel = ( (sprite[j].z-sz-dal-(4<<8))*768) / (ldist( &sprite[ps[p].i], &sprite[j]));
+						sa = getangle(sprite[j].x-sx,sprite[j].y-sy);
+					}
+					else zvel = (100-ps[p].horiz-ps[p].horizoff)*98;
             }
             else if(s->statnum != 3)
             {
@@ -1828,6 +1828,38 @@ void getinput(short snum)
           }
 	}
 
+	{
+		int32 i;
+		if (myaimmode) i = analog_lookingupanddown;
+		else i = MouseAnalogueAxes[1];
+
+		if (i != mouseyaxismode) {
+			CONTROL_MapAnalogAxis(1, i, controldevice_mouse);
+			mouseyaxismode = i;
+		}
+	}
+
+    CONTROL_GetInput( &info );
+
+	info.dx += lastinfo.dx;
+	info.dy += lastinfo.dy;
+	info.dz += lastinfo.dz;
+	info.dyaw   += lastinfo.dyaw;
+	info.dpitch += lastinfo.dpitch;
+	info.droll  += lastinfo.droll;
+	memset(&lastinfo, 0, sizeof(lastinfo));
+
+    tics = totalclock-lastcontroltime;
+    lastcontroltime = totalclock;
+    
+#ifdef WITHMAPDUMPSLASH
+    // JBF: Map dump hack
+    if (KB_KeyDown[sc_BackSlash]) {
+	saveboard("jonof.map",&ps[snum].posx,&ps[snum].posy,&ps[snum].posz,&ps[snum].ang,&ps[snum].cursectnum);
+	KB_KeyDown[sc_BackSlash] = 0;
+    }
+#endif
+
     if(multiflag == 1)
     {
         loc.bits =   1<<17;
@@ -1898,7 +1930,6 @@ if (!VOLUMEONE) {
     loc.bits |=   KB_KeyPressed(sc_Escape)<<31;
 
     running = BUTTON(gamefunc_Run)|ud.auto_run;
-
     svel = vel = angvel = horiz = 0;
 
 	if( BUTTON(gamefunc_Strafe) ) {
@@ -2442,7 +2473,7 @@ void processinput(short snum)
         }
     }
   */
-    if(p->pals_time > 0)
+    if(p->pals_time >= 0)	// JBF 20040101: was > 0
         p->pals_time--;
 
     if(p->fta > 0)
@@ -2593,7 +2624,7 @@ void processinput(short snum)
         p->ang =  SA;
         p->posxv = p->posyv = s->xvel = 0;
         p->look_ang = 0;
-		p->rotscrnang = 0;
+	p->rotscrnang = 0;
 
         doincrements(p);
 
@@ -3124,7 +3155,7 @@ void processinput(short snum)
 
         if(truefdist < PHEIGHT+(8<<8) )
             if( k == 1 || k == 3 )
-        {
+            {
             if(p->spritebridge == 0 && p->walking_snd_toggle == 0 && p->on_ground)
             {
                 switch( psectlotag )
@@ -3279,6 +3310,7 @@ void processinput(short snum)
                 activatebysector(psect,pi);
         }
 
+		i = 0;
         if( sb_snum&(1<<18) || p->hard_landing)
             p->return_to_center = 9;
 
@@ -3287,6 +3319,7 @@ void processinput(short snum)
             p->return_to_center = 9;
             if( sb_snum&(1<<5) ) p->horiz += 12;
             p->horiz += 12;
+			i++;
         }
 
         else if( sb_snum&(1<<14) )
@@ -3294,39 +3327,43 @@ void processinput(short snum)
             p->return_to_center = 9;
             if( sb_snum&(1<<5) ) p->horiz -= 12;
             p->horiz -= 12;
+			i++;
         }
 
         else if( sb_snum&(1<<3) )
         {
             if( sb_snum&(1<<5) ) p->horiz += 6;
             p->horiz += 6;
+			i++;
         }
 
         else if( sb_snum&(1<<4) )
         {
             if( sb_snum&(1<<5) ) p->horiz -= 6;
             p->horiz -= 6;
+			i++;
         }
         if(p->return_to_center > 0)
             if( (sb_snum&(1<<13)) == 0 && (sb_snum&(1<<14)) == 0 )
         {
             p->return_to_center--;
             p->horiz += 33-(p->horiz/3);
+			i++;
         }
 
         if(p->hard_landing > 0)
         {
             p->hard_landing--;
             p->horiz -= (p->hard_landing<<4);
+			i++;
         }
 
-        if(p->aim_mode)
-            p->horiz += sync[snum].horz>>1;
-        else
+        if(i)
         {
              if( p->horiz > 95 && p->horiz < 105) p->horiz = 100;
              if( p->horizoff > -5 && p->horizoff < 5) p->horizoff = 0;
         }
+        p->horiz += sync[snum].horz/2;//>>1;
 
         if(p->horiz > 299) p->horiz = 299;
         else if(p->horiz < -99) p->horiz = -99;
@@ -3336,7 +3373,7 @@ void processinput(short snum)
     if( p->show_empty_weapon > 0)
     {
         p->show_empty_weapon--;
-        if(p->show_empty_weapon == 0)
+        if(p->show_empty_weapon == 0 && (p->weaponswitch & 2))
         {
             if(p->last_full_weapon == GROW_WEAPON)
                 p->subweapon |= (1<<GROW_WEAPON);
@@ -3664,7 +3701,7 @@ void processinput(short snum)
 
                 if((*kb) >= 5)
                 {
-                    if( p->ammo_amount[PISTOL_WEAPON] <= 0 || (p->ammo_amount[PISTOL_WEAPON]%(NAM?20:12)) )
+                    if( p->ammo_amount[PISTOL_WEAPON] <= 0 || (p->ammo_amount[PISTOL_WEAPON]%12) )
                     {
                         (*kb)=0;
                         checkavailweapon(p);
@@ -3800,7 +3837,7 @@ void processinput(short snum)
                 }
                 else
                 {
-					if( (*kb) > 10)
+                    if( (*kb) > 10)
                     {
                         (*kb) = 0;
 
@@ -3996,6 +4033,10 @@ void computergetinput(int snum, input *syn)
 
     if (!(numframes&7))
     {
+        x2 = sprite[ps[goalplayer[snum]].i].x;
+        y2 = sprite[ps[goalplayer[snum]].i].y;
+        z2 = sprite[ps[goalplayer[snum]].i].z;
+	
         if (!cansee(x1,y1,z1-(48<<8),damysect,x2,y2,z2-(48<<8),sprite[ps[goalplayer[snum]].i].sectnum))
             goalplayer[snum] = snum;
     }
