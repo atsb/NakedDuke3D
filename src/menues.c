@@ -33,7 +33,7 @@ Modifications for JonoF's port by Jonathon Fowler (jf@jonof.id.au)
 #include <assert.h>
 
 /* Error codes */
-#define eTenBnNotInWindows 3801
+ #define eTenBnNotInWindows 3801
 
 struct savehead {
     char name[19];
@@ -65,6 +65,7 @@ static struct vidset {
 static int curvidset, newvidset, numvidsets;
 
 static const char *mousebuttonnames[] = { "Left", "Right", "Middle", "Thumb", "Wheel Down", "Wheel Up" };
+
 
 void cmenu(short cm)
 {
@@ -163,6 +164,9 @@ int loadpheader(char spot,struct savehead *saveh)
     if (waloff[TILE_LOADSHOT] == 0) allocache((void **)&waloff[TILE_LOADSHOT],320*200,&walock[TILE_LOADSHOT]);
     tilesizx[TILE_LOADSHOT] = 200; tilesizy[TILE_LOADSHOT] = 320;
     if (kdfread((char *)waloff[TILE_LOADSHOT],320,200,fil) != 200) goto corrupt;
+#if USE_POLYMOST && USE_OPENGL
+    invalidatetile(TILE_LOADSHOT,0,255);
+#endif
 
     kclose(fil);
 
@@ -276,6 +280,9 @@ int loadplayer(signed char spot)
     if (waloff[TILE_LOADSHOT] == 0) allocache((void **)&waloff[TILE_LOADSHOT],320*200,&walock[TILE_LOADSHOT]);
     tilesizx[TILE_LOADSHOT] = 200; tilesizy[TILE_LOADSHOT] = 320;
     if (kdfread((char *)waloff[TILE_LOADSHOT],320,200,fil) != 200) goto corrupt;
+#if USE_POLYMOST && USE_OPENGL
+    invalidatetile(TILE_LOADSHOT,0,255);
+#endif
 
     if (kdfread(&numwalls,2,1,fil) != 1) goto corrupt;
     if (kdfread(&wall[0],sizeof(walltype),MAXWALLS,fil) != MAXWALLS) goto corrupt;
@@ -1057,8 +1064,7 @@ void menus(void)
     short c,x,i,s;
     int l,m;
     char *p = NULL;
-	int tenerr;
-
+    int tenerr;
     getpackets();
 
     if( (ps[myconnectindex].gm&MODE_MENU) == 0 )
@@ -1117,13 +1123,14 @@ void menus(void)
 
             if( x >= -1 ) cmenu(100);
             break;
-		case 20001:
-            x = probe(188,80+32+32,0,0);
-            gametext(160,86-8,"You must be in Windows 95 to",0,2+8+16);
-            gametext(160,86,"play on TEN",0,2+8+16);
-            gametext(160,86+32,"PRESS ANY KEY...",0,2+8+16);
-            if(x >= -1) cmenu(0);
-            break;
+            
+        case 20001:
+             x = probe(188,80+32+32,0,0);
+             gametext(160,86-8,"You must be in Windows 95 to",0,2+8+16);
+             gametext(160,86,"play on TEN",0,2+8+16);
+             gametext(160,86+32,"PRESS ANY KEY...",0,2+8+16);
+             if(x >= -1) cmenu(0);
+             break;
 
         case 15001:
         case 15000:
@@ -1613,6 +1620,7 @@ cheat_for_port_credits:
                    p = "Jonathon \"JonoF\" Fowler";
                    minitext(160-(Bstrlen(p)<<1), 40+10-l, p, 12, 10+16+128);
                    
+                   gametext(160,60-l,"\"POLYMOST\" 3D RENDERER",0,2+8+16);
                    gametext(160,60+8-l,"NETWORKING, OTHER CODE",0,2+8+16);
                    p = "Ken \"Awesoken\" Silverman";
                    minitext(160-(Bstrlen(p)<<1), 60+8+10-l, p, 12, 10+16+128);
@@ -1664,7 +1672,7 @@ cheat_for_port_credits:
 
                    for (i=0;i<2;i++) {
                        switch (i) {
-                           case 0: p = "Visit github.com/atsb/NakedDuke3D for"; break;
+                           case 0: p = "Visit http://www.jonof.id.au/jfduke3d for"; break;
                            case 1: p = "the source code, latest news, and updates of this port."; break;
                        }
                        minitext(160-(Bstrlen(p)<<1), 135+10+(i*7)-l, p, 8, 10+16+128);
@@ -1701,7 +1709,7 @@ cheat_for_port_credits:
                             if(movesperpacket == 4 || numplayers > 1)
                                 break;
 
-				        case eTenBnNotInWindows:
+                        case eTenBnNotInWindows:
                             cmenu(20001);
                             break;
                         default:
@@ -1741,11 +1749,11 @@ cheat_for_port_credits:
             }
             else
                 menutext(c,67,SHX(-2),PHX(-2),"NEW GAME");
-
+            
             if(movesperpacket != 4 && numplayers < 2)
-                menutext(c,67+16,SHX(-3),PHX(-3),"PLAY ON TEN");
-            else
-                menutext(c,67+16,SHX(-3),1,"PLAY ON TEN");
+                 menutext(c,67+16,SHX(-3),PHX(-3),"PLAY ON TEN");
+             else
+                 menutext(c,67+16,SHX(-3),1,"PLAY ON TEN");
 
             menutext(c,67+16+16,SHX(-4),PHX(-4),"OPTIONS");
 
@@ -1753,7 +1761,7 @@ cheat_for_port_credits:
                 menutext(c,67+16+16+16,SHX(-5),1,"LOAD GAME");
             else menutext(c,67+16+16+16,SHX(-5),PHX(-5),"LOAD GAME");
 
-            menutext(c,67+16+16+16+16,SHX(-5),PHX(-5), VOLUMEALL ? "HELP" : "HOW TO ORDER");
+            menutext(c,67+16+16+16+16,SHX(-6),PHX(-6), VOLUMEALL ? "HELP" : "HOW TO ORDER");
 
             menutext(c,67+16+16+16+16+16,SHX(-7),PHX(-7),"CREDITS");
 
@@ -1856,13 +1864,14 @@ if (!VOLUMEALL) {
         case 100:
             rotatesprite(160<<16,19<<16,65536L,0,MENUBAR,16,0,10,0,0,xdim-1,ydim-1);
             menutext(160,24,0,0,"SELECT AN EPISODE");
-            if(boardfilename[0])
+//            if(boardfilename[0])
 if (PLUTOPAK)
                 x = probe(160,60,20,5);
-            else x = probe(160,60,20,4);
-            if(boardfilename[0])
+//            else x = probe(160,60,20,4);
+//            if(boardfilename[0])
+else
                 x = probe(160,60,20,VOLUMEONE?3:4);
-            else x = probe(160,60,20,3);
+//            else x = probe(160,60,20,3);
             if(x >= 0)
             {
 if (VOLUMEONE) {
@@ -1877,17 +1886,17 @@ if (VOLUMEONE) {
 }
 
 if (!VOLUMEONE) {
-                if(!PLUTOPAK && x == 3 && boardfilename[0])
+                if(!PLUTOPAK && x == 3 /*&& boardfilename[0]*/)
                 {
-                    ud.m_volume_number = 0;
-                    ud.m_level_number = 7;
+                    //ud.m_volume_number = 0;
+                    //ud.m_level_number = 7;
             currentlist = 1;
             cmenu(101);
                 }
-        else if(PLUTOPAK && x == 4 && boardfilename[0])
+        else if(PLUTOPAK && x == 4 /*&& boardfilename[0]*/)
                 {
-                    ud.m_volume_number = 0;
-                    ud.m_level_number = 7;
+                    //ud.m_volume_number = 0;
+                    //ud.m_level_number = 7;
             currentlist = 1;
             cmenu(101);
                 }
@@ -1919,17 +1928,17 @@ if (PLUTOPAK)
             menutext(160,60+20+20,SHX(-4),PHX(-4),volume_names[2]);
 if (PLUTOPAK) {
         menutext(160,60+20+20+20,SHX(-5),PHX(-5),volume_names[3]);
-            if(boardfilename[0])
-            {
+//            if(boardfilename[0])
+//            {
                 menutext(160,60+20+20+20+20,SHX(-6),PHX(-6),"USER MAP");
-                gametextpal(160,60+20+20+20+20+3,boardfilename,16+(sintable[(totalclock<<4)&2047]>>11),2);
-            }
+//                gametextpal(160,60+20+20+20+20+3,boardfilename,16+(sintable[(totalclock<<4)&2047]>>11),2);
+//            }
 } else {
-            if(boardfilename[0])
-            {
+//            if(boardfilename[0])
+//            {
                 menutext(160,60+20+20+20,SHX(-6),PHX(-6),"USER MAP");
-                gametext(160,60+20+20+20+6,boardfilename,2,2+8+16);
-            }
+//                gametext(160,60+20+20+20+6,boardfilename,2,2+8+16);
+//            }
 }
 
 }
@@ -2147,7 +2156,7 @@ if (PLUTOPAK) {
             x = probesm(c,yy+5,0,io);
 
             if (x == -1) { cmenu(200); break; }
-#define OFFSHADE 16 
+#define OFFSHADE 16
             yy = 31;
             for (ii=io=0; opts[ii]; ii++) {
                 if (opts[ii][0] == '-' && !opts[ii][1]) {
@@ -2365,7 +2374,11 @@ if (PLUTOPAK) {
             changesmade = 0;
 
             c = (320>>1)-120;
+#if USE_POLYMOST && USE_OPENGL
+            i = 7;
+#else
             i = 5;
+#endif
             onbar = (probey == 4);
             if (probey <= 2)
                 x = probe(c+6,50,16,i);
@@ -2431,6 +2444,26 @@ if (PLUTOPAK) {
 
                 case 4: // Brightness.
                     break;
+
+#if USE_POLYMOST && USE_OPENGL
+                case 5: // Filtering.
+                    if (bpp==8) break;
+                    switch (gltexfiltermode) {
+                        case 0: gltexfiltermode = 3; break;
+                        case 3: gltexfiltermode = 5; break;
+                        case 5: gltexfiltermode = 0; break;
+                        default: gltexfiltermode = 3; break;
+                    }
+                    gltexapplyprops();
+                    break;
+
+                case 6: // Anisotropy.
+                    if (bpp==8) break;
+                    glanisotropy *= 2;
+                    if (glanisotropy > glinfo.maxanisotropy) glanisotropy = 1;
+                    gltexapplyprops();
+                    break;
+#endif
             }
             if (changesmade) {
                 // Find the next/prev video mode matching the new vidset.
@@ -2483,6 +2516,22 @@ if (PLUTOPAK) {
                 setbrightness(ud.brightness>>2,&ps[myconnectindex].palette[0],0);
             }
         }
+
+#if USE_POLYMOST && USE_OPENGL
+        menutext(c,50+62+16+16,0,bpp==8,"FILTERING");
+            switch (gltexfiltermode) {
+                case 0: strcpy(buf,"NEAREST"); break;
+                case 3: strcpy(buf,"BILINEAR"); break;
+                case 5: strcpy(buf,"TRILINEAR"); break;
+                default: strcpy(buf,"OTHER"); break;
+            }
+            menutext(c+154,50+62+16+16,0,bpp==8,buf);
+
+        menutext(c,50+62+16+16+16,0,bpp==8,"ANISOTROPY");
+            if (glanisotropy == 1) strcpy(buf,"NONE");
+            else sprintf(buf,"%d-tap",glanisotropy);
+            menutext(c+154,50+62+16+16+16,0,bpp==8,buf);
+#endif
         break;
 
     case 204:
@@ -2706,14 +2755,14 @@ if (PLUTOPAK) {
                 cmenu(212);
                 probey = 2+(whichkey^2);
             } else if (function == 2) {
-				JoystickFunctions[whichkey>>1][whichkey&1] = x;
-				CONTROL_MapButton( x, whichkey>>1, whichkey&1, controldevice_joystick);
+                JoystickFunctions[whichkey>>1][whichkey&1] = x;
+                CONTROL_MapButton( x, whichkey>>1, whichkey&1, controldevice_joystick);
                 cmenu(213);
                 probey = whichkey;
             } else if (function == 3) {
                 JoystickDigitalFunctions[whichkey>>1][whichkey&1] = x;
                 CONTROL_MapDigitalAxis(whichkey>>1, x, whichkey&1, controldevice_joystick);
-				cmenu(214+(whichkey>>2));
+                cmenu(214+(whichkey>>2));
                 probey = 1+((whichkey>>1)&1)*4+(whichkey&1);
             }
             break;
@@ -2736,7 +2785,7 @@ if (PLUTOPAK) {
             }
         } else if (function == 2) {
             static const char *directions[] = { "UP", "RIGHT", "DOWN", "LEFT" };
-			Bsprintf(buf,"TO %s%s", (whichkey&1)?"DOUBLE-CLICKED ":"", getjoyname(1,whichkey>>1));
+            Bsprintf(buf,"TO %s%s", (whichkey&1)?"DOUBLE-CLICKED ":"", getjoyname(1,whichkey>>1));
         } else if (function == 3) {
             Bsprintf(buf,"TO DIGITAL %s %s",getjoyname(0,whichkey>>1),(whichkey&1)?"POSITIVE":"NEGATIVE");
         }
@@ -2951,7 +3000,7 @@ if (PLUTOPAK) {
             function = 2;
             whichkey = x;
             cmenu(211);
-			probey = JoystickFunctions[x>>1][x&1];
+            probey = JoystickFunctions[x>>1][x&1];
             if (probey < 0) probey = NUMGAMEFUNCTIONS-1;
             break;
         }
@@ -2965,8 +3014,8 @@ if (PLUTOPAK) {
         }
         
         for (l=0; l<min(13,c); l++) {
-			sprintf(buf, "%s%s", ((l+m)&1)?"Double ":"", getjoyname(1,(l+m)>>1));
-			x = JoystickFunctions[(l+m)>>1][(l+m)&1];
+            sprintf(buf, "%s%s", ((l+m)&1)?"Double ":"", getjoyname(1,(l+m)>>1));
+            x = JoystickFunctions[(l+m)>>1][(l+m)&1];
             minitextshade(80-4,33+l*8,buf,(m+l == probey)?0:16,0,10+16);
 
             if (x == -1)
@@ -3067,7 +3116,7 @@ if (PLUTOPAK) {
         gametext(140,38,buf,0,2+8+16);
 
         gametext(76,38+15,"DIGITAL",0,2+8+16);
-			gametext(140, 38+15, "-", 0, 2+8+16);
+            gametext(140, 38+15, "-", 0, 2+8+16);
             if (JoystickDigitalFunctions[thispage*2][0] < 0)
                 strcpy(buf, "  -NONE-");
             else
@@ -3076,7 +3125,7 @@ if (PLUTOPAK) {
             for (i=0;buf[i];i++) if (buf[i]=='_') buf[i] = ' ';
             minitext(140+12,38+16,buf,0,10+16);
 
-			gametext(140+72, 38+15, "+", 0, 2+8+16);
+            gametext(140+72, 38+15, "+", 0, 2+8+16);
             if (JoystickDigitalFunctions[thispage*2][1] < 0)
                 strcpy(buf, "  -NONE-");
             else
@@ -3106,7 +3155,7 @@ if (PLUTOPAK) {
             gametext(140,38+64,buf,0,2+8+16);
 
             gametext(76,38+64+15,"DIGITAL",0,2+8+16);
-				gametext(140, 38+64+15, "-", 0, 2+8+16);
+                gametext(140, 38+64+15, "-", 0, 2+8+16);
                 if (JoystickDigitalFunctions[thispage*2+1][0] < 0)
                     strcpy(buf, "  -NONE-");
                 else
@@ -3115,7 +3164,7 @@ if (PLUTOPAK) {
                 for (i=0;buf[i];i++) if (buf[i]=='_') buf[i] = ' ';
                 minitext(140+12,38+16+64,buf,0,10+16);
 
-				gametext(140+72, 38+64+15, "+", 0, 2+8+16);
+                gametext(140+72, 38+64+15, "+", 0, 2+8+16);
                 if (JoystickDigitalFunctions[thispage*2+1][1] < 0)
                     strcpy(buf, "  -NONE-");
                 else
@@ -3196,7 +3245,7 @@ if (PLUTOPAK) {
             sprintf(buf,"Page %d of %d", 1+(current_menu-220), (joynumaxes+3)/4);
             gametext(320-100,158,buf,0,2+8+16);
         }
-        break;      
+        break;
     }
         
         case 700:
@@ -4486,6 +4535,9 @@ void playanm(const char *fn,char t)
         else                           ototalclock += 10;
 
         waloff[TILE_ANIM] = (intptr_t)(ANIM_DrawFrame(i));
+#if USE_POLYMOST && USE_OPENGL
+        invalidatetile(TILE_ANIM, 0, 1<<4);  // JBF 20031228
+#endif
         clearallviews(0);
         rotatesprite(0<<16,0<<16,65536L,512,TILE_ANIM,0,0,2+4+8+16+64, 0,0,xdim-1,ydim-1);
         nextpage();
@@ -4510,4 +4562,3 @@ void playanm(const char *fn,char t)
 /*
  * vim:ts=4:sw=4:tw=8:enc=utf-8:
  */
-
