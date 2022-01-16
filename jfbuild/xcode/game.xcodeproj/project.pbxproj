@@ -241,7 +241,7 @@
 		AB73602D0A29AB08003261DC /* game-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "game-Info.plist"; sourceTree = "<group>"; };
 		AB7360500A29AD92003261DC /* Build Editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Build Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB7360520A29AD92003261DC /* build-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "build-Info.plist"; sourceTree = "<group>"; };
-		AB7361220A29B9D4003261DC /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Users/jonof/Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
+		AB7361220A29B9D4003261DC /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		AB7361280A29BA60003261DC /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		AB73612C0A29BA7A003261DC /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		AB81F9562590BB8500306B8E /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
@@ -621,9 +621,10 @@
 					RENDERTYPESDL,
 				);
 				HEADER_SEARCH_PATHS = ../include;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-W",
 					"-Wall",
@@ -649,8 +650,9 @@
 					RENDERTYPESDL,
 				);
 				HEADER_SEARCH_PATHS = ../include;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				PREBINDING = NO;
+				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-W",
 					"-Wall",

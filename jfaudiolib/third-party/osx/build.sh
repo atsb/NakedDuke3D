@@ -49,18 +49,6 @@ EOT
 if test ! -f $destdir/out/lib/libogg.a; then
     check_tools
 
-    mkdir libogg-build
-
-    echo "+++ Fetching and unpacking $oggurl"
-    if [ -f $oggfile ]; then
-        check_file $oggfilesum $oggfile || rm -f $oggfile
-    fi
-    if [ ! -f $oggfile ]; then
-        curl -sL $oggurl -o $oggfile || exit
-        check_file $oggfilesum $oggfile || rm -f $oggfile
-    fi
-    (cd libogg-build; tar zx --strip-components 1) < $oggfile || exit
-
     echo "+++ Configuring libogg"
     (cd libogg-build; ./configure --prefix=/out) || exit
 
@@ -76,18 +64,6 @@ fi
 
 if test ! -f $destdir/out/lib/libvorbisfile.a; then
     check_tools
-
-    mkdir libvorbis-build
-
-    echo "+++ Fetching and unpacking $vorbisurl"
-    if [ -f $vorbisfile ]; then
-        check_file $vorbisfilesum $vorbisfile || rm -f $vorbisfile
-    fi
-    if [ ! -f $vorbisfile ]; then
-        curl -sL $vorbisurl -o $vorbisfile || exit
-        check_file $vorbisfilesum $vorbisfile || rm -f $vorbisfile
-    fi
-    (cd libvorbis-build; tar zx --strip-components 1) < $vorbisfile || exit
 
     echo "+++ Configuring libvorbis"
     (cd libvorbis-build; PKG_CONFIG=/usr/bin/false ./configure --prefix=/out --with-ogg=$destdir/out) || exit

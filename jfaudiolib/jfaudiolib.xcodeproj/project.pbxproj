@@ -361,7 +361,7 @@
 					__MACOSX__,
 				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/third-party/osx/out/include/**";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				ONLY_ACTIVE_ARCH = YES;
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
@@ -383,7 +383,7 @@
 					__MACOSX__,
 				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/third-party/osx/out/include/**";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
 					"-W",
