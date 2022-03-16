@@ -2,21 +2,27 @@ Gibbon's Duke Nukem 3D Port
 ==========================
 Thanks to JFDuke / Jonathon Fowler, with contributions by Ken Silverman and others.
 
-The goal of this source port is to make Duke3D as close to the original DOS as possible.  I will however, be keeping the Input/Video/Game etc..  options as they are
-in JFDuke3D as a compromise for ease-of-use.
+The goal of this source port is to make Duke3D as close to the original DOS as possible.
+
+I will be doing the following:
+* porting the menu code from the original source release as well as fixes from xDuke and the Icculus source port.
+* reverse engineering the v1.5 executable so that the DOS release demos are compatible.  I won't be doing a compat layer but instead will support only v1.5 demos eventually.
+* allow demos to playback on the menu screen just like the original.
+* remove all modern features from the menu and video options (no hi-res, no GLES/GL rendering at all).  Software 8-bit only.
+* netcode will be taken from xDuke.
+* legacy resolutions and aspect ratio corrections
 
 Minimum system requirements
 ---------------------------
 
 * 32 or 64-bit CPU. These have been tried first-hand:
   * Intel x86, x86_64
-  * PowerPC 32-bit (big-endian)
   * ARM 32-bit hard-float, 64-bit
+  * Apple M1 (ARMv8)
 * A modern operating system:
   * Linux, BSD, possibly other systems supported by [SDL 2.0](http://libsdl.org/).
-  * macOS 10.9+
-  * Windows Vista, 7, 8/10+
-* Optional: 3D acceleration with OpenGL 2.0 or OpenGL ES 2.0 capable hardware.
+  * macOS 11.5+
+  * Windows 10/11
 
 You will require game data from an original release of Duke Nukem 3D
 
@@ -49,21 +55,21 @@ Now, based on your chosen OS and compiler:
    1. Fetch _SDL2-2.0.x.dmg_ from http://libsdl.org/download-2.0.php.
    2. Copy _SDL2.framework_ found in the DMG file to `~/Library/Frameworks`. Create the
       _Frameworks_ directory if it doesn't exist on your system.
-3. Open _duke3d.xcodeproj_ from within the JFDuke3D source code's _xcode_ folder.
+3. Open _duke3d.xcodeproj_ from within the Naked Duke's source code's _xcode_ folder.
 4. From the Product menu choose Run.
 
-### Windows using Microsoft Visual C++ 2015 (or newer) and NMAKE
+### Windows using Microsoft Visual Studio 2022 and NMAKE
 
 1. If needed, [install Visual Studio Community 2017 for free from
    Microsoft](https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio).
    Terms and conditions apply. Install at minimum these components:
-   * VC++ 2015.3 v140 toolset for desktop (x86,x64)
+   * MSVC 2022 v141 toolset for desktop (x86,x64,arm)
    * Windows Universal CRT SDK
-   * Windows 8.1 SDK
-2. Open the command-line build prompt. e.g. _VS2015 x64 Native Tools Command Prompt_
-   or _VS2015 x86 Native Tools Command Prompt_.
+   * Windows 10 SDK
+2. Open the command-line build prompt. e.g. _VS2022 x64 Native Tools Command Prompt_
+   or _VS2022 x86 Native Tools Command Prompt_.
 3. Change into the JFDuke3D source code folder, then compile the game with: `nmake /f Makefile.msvc`
-5. Assuming success, run the game with: `duke3d`
+5. Assuming success, run the game with: `nakedduke`
 
 Compilation options
 -------------------
