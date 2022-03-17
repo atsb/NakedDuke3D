@@ -7340,6 +7340,9 @@ void Shutdown( void )
     KB_Shutdown();
 }
 
+static char todd[] = "Duke Nukem 3D(tm) Copyright 1989, 1996 Todd Replogle and 3D Realms Entertainment";
+static char trees[] = "I want to make a game with trees";
+static char sixteen[] = "16 Possible Dukes";
 /*
 ===================
 =
